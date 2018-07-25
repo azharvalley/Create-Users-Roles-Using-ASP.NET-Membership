@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "Dashobard";
+}
+
+<h2>Dashobard</h2>
+
+
+<h2>You are successfully Logged In</h2>
+
+<p>Email: @ViewBag.Email</p>
+<p>
+    Role:
+
+    @foreach (var role in Roles.GetRolesForUser(ViewBag.Email))
+    {
+        @role <br />
+    }
+</p>
+

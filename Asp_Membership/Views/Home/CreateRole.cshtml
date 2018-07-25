@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewBag.Title = "Create Role";
+}
+
+
+
+
+<h1>List of Roles</h1>
+<ul>
+    @foreach (var role in ViewBag.AllRoles)
+    {
+        <li>@Html.Raw(role)</li>
+    }
+</ul>
+
+
+<h2>Create Role</h2>
+
+<form action="/Home/CreateRole" method="post">
+    Enter Role Name: <input type="text" name="txtRole" id="txtRole" required/>
+    <input type="submit" value="Create Role" />
+</form>
+<br /><br />
+<p style="color:#08b235;font-weight:500;">@ViewBag.Success</p>
+<p style="color:#ff0000;font-weight:500;">@ViewBag.ErrorMessage</p>

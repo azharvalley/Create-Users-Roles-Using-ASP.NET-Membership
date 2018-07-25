@@ -1,0 +1,90 @@
+﻿
+@{
+    ViewBag.Title = "CreateUser";
+}
+
+<h2>Create User</h2>
+
+<form action="/Home/CreateUser" method="post">
+    <table>
+        <tr>
+            <td>Enter Email:</td>
+            <td><input type="email" name="txtEmail" id="txtEmail" required/></td>
+        </tr>
+        <tr>
+            <td>Enter Password:</td>
+            <td><input type="password" name="txtPassword" id="txtPassword" required/></td>
+        </tr>
+        <tr>
+            <td>Enter Security Question:</td>
+            <td><input type="text" name="txtSecurityQuestion" id="txtSecurityQuestion" required/></td>
+        </tr>
+        <tr>
+            <td>Enter Security Answer:</td>
+            <td><input type="text" name="txtSecurityAnswer" id="txtSecurityAnswer" required/></td>
+        </tr>
+        <tr>
+            <td>Select Role:</td>
+            <td>
+                <select id="drpRole" name="drpRole" required>
+                    @foreach (var role in ViewBag.AllRoles)
+                    {
+                        <option value="@role">@role</option>
+                    }
+
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td> <input type="submit" value="Create User" /></td>
+        </tr>
+    </table>
+
+
+
+
+</form>
+<br /><br />
+<p style="color:#08b235;font-weight:500;">@ViewBag.Success</p>
+<p style="color:#ff0000;font-weight:500;">@ViewBag.ErrorMessage</p>
+
+
+
+<hr />
+
+<h1>List Of Users</h1>
+
+<table border="1" cellpadding="10">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (MembershipUser user in ViewBag.AllUsers)
+        {
+        <tr>
+            <td>@user.UserName</td>
+            <td>
+                @foreach (var role in Roles.GetRolesForUser(user.UserName))
+                {
+                    @role <br />
+                }
+
+            </td>
+            <td>Edit</td>
+            <td><a href="/Home/RemoveUser?email=@user.UserName" onclick="return confirm('Are you sure, want to delete this user?')">Delete</a></td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+
