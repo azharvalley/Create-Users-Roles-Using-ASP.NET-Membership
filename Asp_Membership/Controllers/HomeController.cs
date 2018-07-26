@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Asp_Membership.Models;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using static Asp_Membership.Models.MyModel;
 
 namespace Asp_Membership.Controllers
 {
@@ -154,6 +157,9 @@ namespace Asp_Membership.Controllers
         }
 
 
+        
+
+
         [AllowAnonymous]
         public ActionResult Login()
         {
@@ -212,6 +218,131 @@ namespace Asp_Membership.Controllers
 
             return View();
         }
+
+        #region Change Password Code
+
+        [Authorize]
+        public ActionResult ChangePassword(ManageMessageId? message)
+        {
+            ViewBag.StatusMessage =
+                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
+                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
+                : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
+                : "";
+
+            bool hasLocalAccount;
+            DataTable dtUsers = DBConnect.selectUserId(User.Identity.Name);
+
+            string userid = dtUsers.Rows[0]["UserId"].ToString();
+
+            DataTable dtCheckAccount = DBConnect.HasLocalAccount(userid);
+
+            if (dtCheckAccount.Rows.Count > 0)
+            {
+                hasLocalAccount = true;
+            }
+            else
+            {
+                hasLocalAccount = false;
+            }
+            ViewBag.HasLocalPassword = hasLocalAccount;
+            ViewBag.ReturnUrl = Url.Action("changepassword");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
+        public ActionResult ChangePassword(LocalPasswordModel model)
+        {
+            bool hasLocalAccount;
+            DataTable dtUsers = DBConnect.selectUserId(User.Identity.Name);
+
+            string userid = dtUsers.Rows[0]["UserId"].ToString();
+
+            DataTable dtCheckAccount = DBConnect.HasLocalAccount(userid);
+
+            if (dtCheckAccount.Rows.Count > 0)
+            {
+                hasLocalAccount = true;
+            }
+            else
+            {
+                hasLocalAccount = false;
+            }
+            ViewBag.HasLocalPassword = hasLocalAccount;
+            ViewBag.ReturnUrl = Url.Action("changepassword");
+            if (hasLocalAccount)
+            {
+                if (ModelState.IsValid)
+                {
+                    // ChangePassword will throw an exception rather than return false in certain failure scenarios.
+                    bool changePasswordSucceeded;
+                    try
+                    {
+                        //# Method 1: Using MembershipUser virtual method to change the password.
+                        //Updates the password for the membership user in the membership data store.
+                        MembershipUser u = Membership.GetUser();
+                        changePasswordSucceeded = u.ChangePassword(model.OldPassword, model.NewPassword);
+                        //End # Method 1
+
+                        //# Method 2: Below code is update Password using user defined Store Procedure.
+                        //if (Membership.ValidateUser(User.Identity.Name, model.OldPassword))
+                        //{
+                        //    DBConnect.Changepassword(userid, model.NewPassword);
+                        //    changePasswordSucceeded = true;
+                        //}
+                        //else
+                        //{
+                        //    changePasswordSucceeded = false;
+                        //}
+                        //End # Method 2
+
+                    }
+                    catch (Exception)
+                    {
+                        changePasswordSucceeded = false;
+                    }
+
+                    if (changePasswordSucceeded)
+                    {
+                        return RedirectToAction("changepassword", new { Message = ManageMessageId.ChangePasswordSuccess });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "The old password is incorrect or the new password is invalid.");
+                    }
+                }
+            }
+            else
+            {
+                // User does not have a local password so remove any validation errors caused by a missing
+                // OldPassword field
+                ModelState state = ModelState["OldPassword"];
+                if (state != null)
+                {
+                    state.Errors.Clear();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        Membership.CreateUser(User.Identity.Name, model.NewPassword);
+                        return RedirectToAction("changepassword", new { Message = ManageMessageId.SetPasswordSuccess });
+                    }
+                    catch (Exception e)
+                    {
+                        ModelState.AddModelError("", e);
+                    }
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        #endregion Change Password Code
 
         [HttpPost]
         [ValidateAntiForgeryToken]
