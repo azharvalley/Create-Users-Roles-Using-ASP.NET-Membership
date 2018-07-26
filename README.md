@@ -60,3 +60,22 @@ To use Form Authentication: add below code into the web.config file
     </authentication>
     <!--End -->
 ```
+
+# To update Password You will require to execute some stored procedure. 
+
+You can find the SQL script at the repository directory: /DataBaseScript/SQLScript.sql
+
+I am using Subsonic to interact with Database. 
+You will have to install the package of Subsonic from Package Manager Console
+
+Enter the command (Install-Package Subsonic) in the Package Manager Console, below is the screenshot.
+
+![install-package subsonic](https://user-images.githubusercontent.com/16462866/43260574-88f41b2c-90f7-11e8-8766-b33968792cbd.png)
+
+To use Model validation you will also have to install (System.ComponentModel.DataAnnotations) from the NuGet Package Solution. 
+Below is the screenshot.
+
+![dataannotations_oackage](https://user-images.githubusercontent.com/16462866/43260687-c9396a20-90f7-11e8-97c9-070d4aa53c62.png)
+
+
+
