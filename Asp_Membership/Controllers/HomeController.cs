@@ -190,7 +190,7 @@ namespace Asp_Membership.Controllers
                 }
                 else
                 {
-                    ViewBag.ErrorMessage = "User " + "\"" + Email + "\"" + " does not exists!";
+                    ViewBag.ErrorMessage = "User " + "\"" + Email + "\"" + " or password is Invalid!";
                 }
 
 
